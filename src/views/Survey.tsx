@@ -1,30 +1,31 @@
 import React, { useState } from 'react';
 import { Container, Typography, Stepper, Step, StepLabel, Button, WithStyles, withStyles, Theme, createStyles } from '@material-ui/core';
+import { useParams } from 'react-router-dom';
 
-type Props = WithStyles<typeof styles>;
+interface OwnProps {
+    name: string;
+    stepContent: string[];
+    optionalSteps?: number[];
+}
+
+type Props = OwnProps & WithStyles<typeof styles>;
 
 const Survey: React.FC<Props> = (props) => {
     const { classes } = props;
-    const steps: string[] = ['one', 'two', 'three'];
+
+    const { surveyId } = useParams();
+
+    const steps: string[] = (props.stepContent || []).map(_ => '');
 
     const [activeStep, setActiveStep] = useState<number>(0);
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
     const getStepContent = (step: number) => {
-        switch (step) {
-            case 0:
-                return 'Select campaign settings...';
-            case 1:
-                return 'What is an ad group anyways?';
-            case 2:
-                return 'This is the bit I really care about!';
-            default:
-                return 'Unknown step';
-        }
+        return props.stepContent[step];
     }
 
     const isStepOptional = (step: number) => {
-        return step === 1;
+        return props.optionalSteps?.length && props.optionalSteps.includes(step);
     };
 
     const isStepSkipped = (step: number) => {
@@ -67,7 +68,7 @@ const Survey: React.FC<Props> = (props) => {
 
     return (
         <Container>
-            <Typography variant='h4'>This is a survey</Typography>
+            <Typography variant='h4'>{props.name}</Typography>
             <Stepper activeStep={activeStep}>
                 {steps.map((label, index) => {
                     const stepProps: { completed?: boolean } = {};
@@ -79,7 +80,7 @@ const Survey: React.FC<Props> = (props) => {
                         stepProps.completed = false;
                     }
                     return (
-                        <Step key={label} {...stepProps}>
+                        <Step key={label}  {...stepProps}>
                             <StepLabel {...labelProps}>{label}</StepLabel>
                         </Step>
                     );
