@@ -1,31 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Container, Typography, Stepper, Step, StepLabel, Button, WithStyles, withStyles, Theme, createStyles } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
+import { AppContext } from './AppContext';
 
-interface OwnProps {
-    name: string;
-    stepContent: string[];
-    optionalSteps?: number[];
-}
+// interface OwnProps {
+//     name: string;
+//     stepContent: string[];
+//     optionalSteps?: number[];
+// }
 
-type Props = OwnProps & WithStyles<typeof styles>;
+type Props = WithStyles<typeof styles>;
 
 const Survey: React.FC<Props> = (props) => {
     const { classes } = props;
 
+    const state = useContext(AppContext);
     const { surveyId } = useParams();
 
-    const steps: string[] = (props.stepContent || []).map(_ => '');
+    const survey = state.surveys.find(survey => survey.id === surveyId);
+
+    const steps: string[] = (survey?.stepContent || []).map(_ => '');
 
     const [activeStep, setActiveStep] = useState<number>(0);
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
     const getStepContent = (step: number) => {
-        return props.stepContent[step];
+        return survey?.stepContent[step];
     }
 
     const isStepOptional = (step: number) => {
-        return props.optionalSteps?.length && props.optionalSteps.includes(step);
+        return survey?.optionalSteps?.length && survey?.optionalSteps.includes(step);
     };
 
     const isStepSkipped = (step: number) => {
@@ -68,7 +72,7 @@ const Survey: React.FC<Props> = (props) => {
 
     return (
         <Container>
-            <Typography variant='h4'>{props.name}</Typography>
+            <Typography variant='h4'>{survey?.name}</Typography>
             <Stepper activeStep={activeStep}>
                 {steps.map((label, index) => {
                     const stepProps: { completed?: boolean } = {};

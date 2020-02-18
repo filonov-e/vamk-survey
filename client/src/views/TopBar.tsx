@@ -44,9 +44,9 @@ const TopBar: React.FC<Props> = ({ ...props }) => {
                                 <Typography variant='h6'>Home</Typography>
                             </ListItem>
                         </Link>
-                        <Link to='/survey'>
+                        <Link to='/surveys'>
                             <ListItem button>
-                            <Typography variant='h6'>Survey</Typography>
+                            <Typography variant='h6'>Surveys</Typography>
                             </ListItem>
                         </Link>
                     </List>

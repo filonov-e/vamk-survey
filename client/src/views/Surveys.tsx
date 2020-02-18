@@ -1,25 +1,28 @@
-import React from 'react';
-import { WithStyles, createStyles, Theme, withStyles } from '@material-ui/core';
+import React, { useContext } from 'react';
+import { WithStyles, createStyles, Theme, withStyles, List, ListItem } from '@material-ui/core';
 import { SurveyApi } from '../common/types/common';
 import Survey from './Survey';
+import { Link } from 'react-router-dom';
+import { AppContext } from './AppContext';
 
-interface OwnProps {
-    surveys: SurveyApi[];
-}
-
-type Props = OwnProps & WithStyles<typeof styles>;
+type Props = WithStyles<typeof styles>;
 
 const Surveys: React.FC<Props> = (props) => {
     const { classes } = props;
+    const state = useContext(AppContext);
+    const { surveys } = state;
 
     return (
         <React.Fragment>
-            {/* {props.surveys.map(surveyItem => (
-                //<Survey name={'Test Survey'} stepContent={surveyItem.stepContent} />
-            ))} */}
-            <Survey name={'Test Survey'} stepContent={['one', 'two', 'three']} />
-            <Survey name={'Test Survey'} stepContent={['one', 'two', 'three']} />
-            <Survey name={'Test Survey'} stepContent={['one', 'two', 'three']} />
+            <List>
+                {surveys.map((survey) => (
+                    <Link to={`/surveys/${survey.id}`} key={survey.id}>
+                        <ListItem button>
+                            {survey.name}
+                        </ListItem>
+                    </Link>
+                ))}
+            </List>
         </React.Fragment>
     );
 };
