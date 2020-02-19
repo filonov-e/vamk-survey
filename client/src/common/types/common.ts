@@ -3,7 +3,7 @@ export interface SurveysApi {
 }
 
 export interface SurveyApi {
-    id: string;
+    id: number;
     name: string;
     stepContent: string[];
     optionalSteps?: number[];

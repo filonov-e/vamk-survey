@@ -14,31 +14,32 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mysql_1 = __importDefault(require("mysql"));
+const cors_1 = __importDefault(require("cors"));
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const app = express_1.default();
-const port = 8080; // default port to listen
+app.use(cors_1.default());
+const port = process.env.PORT; // default port to listen
 const connection = mysql_1.default.createConnection({
-    host: 'mysql.cc.puv.fi',
-    user: 'e1700698',
-    password: 'aZVMGYKvKw4f',
-    database: 'e1700698_surveyor'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PWD,
+    database: process.env.DB_NAME
 });
-const getIds = () => {
-    connection.connect();
+connection.connect();
+const getSurveys = () => {
     return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM `surveyIds`', function (error, results, fields) {
+        connection.query('SELECT * FROM `surveys`', function (error, results, fields) {
             if (error)
                 return reject(error);
             resolve(results);
         });
-        connection.end();
     });
 };
-// define a route handler for the default home page
-app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    // let ids: number[] = [];
-    const ids = yield getIds();
-    console.log(ids);
-    res.send("Ids: " + ids[0].surveyId);
+// define endpoint for getting surveys data
+app.get("/getSurveys", (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const surveys = yield getSurveys();
+    res.json(surveys);
 }));
 // start the Express server
 app.listen(port, () => {

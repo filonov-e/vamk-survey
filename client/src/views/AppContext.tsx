@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SurveyApi } from "../common/types/common";
+import { getSurveys } from "../common/db/surveys";
+import { csvToArray } from "../common/tools/common";
 
 interface ContextState {
     isLoadingData: boolean;
@@ -8,41 +10,44 @@ interface ContextState {
 
 const INITIAL_STATE: ContextState = {
     isLoadingData: false,
-    surveys: [
-        {
-            id: '1',
-            name: 'Test Survey 1',
-            stepContent: ['one', 'two', 'three']
-        },
-        {
-            id: '2',
-            name: 'Test Survey 2',
-            stepContent: ['one', 'two', 'three']
-        },
-        {
-            id: '3',
-            name: 'Test Survey 3',
-            stepContent: ['one', 'two', 'three']
-        }
-    ]
+    surveys: []
 }
 
 export const AppContext = React.createContext<ContextState>(INITIAL_STATE);
 
 export const AppContextProvider = (props: any) => {
     const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
-    const [surveys, setSurveys] = useState<SurveyApi[]>(INITIAL_STATE.surveys);
+    const [surveys, setSurveys] = useState<SurveyApi[]>([]);
 
     const { children }: { children: any } = props;
 
+    useEffect(() => {
+        setIsLoadingData(surveys.length === 0);
+    }, [surveys]);
+
+    useEffect(() => {
+        setIsLoadingData(true);
+        getSurveys()
+            .then((data) => {
+                //data.stepContent = csvToArray(data.stepContent, ';');
+                const remoteSurveys = data.map((dataItem: any) => ({
+                    ...dataItem,
+                    stepContent: csvToArray(dataItem.stepContent, ';'),
+                    optionalSteps: dataItem.optionalSteps.length ? csvToArray(dataItem.optionalSteps, ';').map(item => Number(item)) : []
+                }));
+                
+                setSurveys(remoteSurveys);
+            });
+    }, []);
+
     return (
-		<AppContext.Provider
-			value={{
-				isLoadingData,
-				surveys
-			}}
-		>
-			{children}
-		</AppContext.Provider>
-	);
+        <AppContext.Provider
+            value={{
+                isLoadingData,
+                surveys
+            }}
+        >
+            {children}
+        </AppContext.Provider>
+    );
 };

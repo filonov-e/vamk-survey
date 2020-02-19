@@ -1,39 +1,39 @@
 import express from "express";
 import mysql from 'mysql';
+import cors from 'cors';
+import env from 'dotenv';
+
+env.config();
 
 const app = express();
-const port = 8080; // default port to listen
+app.use(cors());
+
+const port = process.env.PORT; // default port to listen
 
 const connection = mysql.createConnection({
-    host: 'mysql.cc.puv.fi',
-    user: 'e1700698',
-    password: 'aZVMGYKvKw4f',
-    database: 'e1700698_surveyor'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PWD,
+    database: process.env.DB_NAME
 });
 
-const getIds = () => {
-    connection.connect();
+connection.connect();
 
+const getSurveys = () => {
     return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM `surveyIds`', function (error, results, fields) {
+        connection.query('SELECT * FROM `surveys`', function (error, results, fields) {
             if (error) return reject(error);
 
             resolve(results);
         });
-
-        connection.end();
     });
 };
 
-// define a route handler for the default home page
-app.get("/", async (req, res) => {
+// define endpoint for getting surveys data
+app.get("/getSurveys", async (req, res, next) => {
+    const surveys: Array<{ id: number, name: string, stepContent: string, optionalSteps: string }> = await getSurveys() as any;
 
-    // let ids: number[] = [];
-    const ids: Array<{ surveyId: number }> = await getIds() as any;
-
-    console.log(ids);
-
-    res.send("Ids: " + ids[0].surveyId);
+    res.json(surveys);
 });
 
 // start the Express server

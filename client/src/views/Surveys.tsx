@@ -1,7 +1,5 @@
 import React, { useContext } from 'react';
 import { WithStyles, createStyles, Theme, withStyles, List, ListItem } from '@material-ui/core';
-import { SurveyApi } from '../common/types/common';
-import Survey from './Survey';
 import { Link } from 'react-router-dom';
 import { AppContext } from './AppContext';
 
@@ -11,6 +9,9 @@ const Surveys: React.FC<Props> = (props) => {
     const { classes } = props;
     const state = useContext(AppContext);
     const { surveys } = state;
+
+    console.log(surveys);
+    
 
     return (
         <React.Fragment>

@@ -3,12 +3,6 @@ import { Container, Typography, Stepper, Step, StepLabel, Button, WithStyles, wi
 import { useParams } from 'react-router-dom';
 import { AppContext } from './AppContext';
 
-// interface OwnProps {
-//     name: string;
-//     stepContent: string[];
-//     optionalSteps?: number[];
-// }
-
 type Props = WithStyles<typeof styles>;
 
 const Survey: React.FC<Props> = (props) => {
@@ -17,7 +11,7 @@ const Survey: React.FC<Props> = (props) => {
     const state = useContext(AppContext);
     const { surveyId } = useParams();
 
-    const survey = state.surveys.find(survey => survey.id === surveyId);
+    const survey = state.surveys.find(survey => survey.id === Number(surveyId));
 
     const steps: string[] = (survey?.stepContent || []).map(_ => '');
 
@@ -107,7 +101,7 @@ const Survey: React.FC<Props> = (props) => {
                                 <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                                     Back
                                 </Button>
-                                {isStepOptional(activeStep) && (
+                                {isStepOptional(activeStep) ? (
                                     <Button
                                         variant="contained"
                                         color="primary"
@@ -116,6 +110,8 @@ const Survey: React.FC<Props> = (props) => {
                                     >
                                         Skip
                                     </Button>
+                                ) : (
+                                    null
                                 )}
                                 <Button
                                     variant="contained"
