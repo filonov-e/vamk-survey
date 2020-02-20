@@ -10,14 +10,20 @@ app.use(cors());
 
 const port = process.env.PORT; // default port to listen
 
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PWD,
-    database: process.env.DB_NAME
-});
+let connection: mysql.Connection;
 
-connection.connect();
+try {
+    connection = mysql.createConnection({
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PWD,
+        database: process.env.DB_NAME
+    });
+
+    connection.connect();
+} catch (e) {
+    console.log(e);
+}
 
 const getSurveys = () => {
     return new Promise((resolve, reject) => {
