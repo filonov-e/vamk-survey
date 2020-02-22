@@ -2,12 +2,14 @@ import express from "express";
 import mysql from 'mysql';
 import cors from 'cors';
 import env from 'dotenv';
+import bodyParser from 'body-parser';
 import { Survey, Question, Answer } from "common/types";
 
 env.config();
 
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
 
 const port = process.env.PORT; // default port to listen
 
@@ -83,13 +85,13 @@ app.post("/getAnswers", async (req, res, next) => {
 });
 
 app.post("/getSurveyQuestions", async (req, res, next) => {
-    const surveyId = req.body;
+    const { surveyId } = req.body;
     const questions: Question[] = await getSurveyQuestionTable(surveyId) as any;
     res.json(questions);
 });
 
 app.post("/getQuestionAnswers", async (req, res, next) => {
-    const questionId = req.body;
+    const { questionId } = req.body;
     const answers: Answer[] = await getQuestionAnswerTable(questionId) as any;
     res.json(answers);
 });
