@@ -2,6 +2,7 @@ import express from "express";
 import mysql from 'mysql';
 import cors from 'cors';
 import env from 'dotenv';
+import { Survey, Question, Answer } from "common/types";
 
 env.config();
 
@@ -25,9 +26,39 @@ try {
     console.log(e);
 }
 
-const getSurveys = () => {
+const getSurveyTable = () => {
     return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM `surveys`', function (error, results, fields) {
+        connection.query('SELECT * FROM `survey`', function (error, results, fields) {
+            if (error) return reject(error);
+
+            resolve(results);
+        });
+    });
+};
+
+const getSurveyQuestionTable = (surveyId?: string) => {
+    const queryString = surveyId ?
+        `SELECT * FROM \`surveyQuestion\` WHERE \`surveyId\` = ${surveyId}`
+        :
+        'SELECT * FROM `surveyQuestion`';
+    
+    return new Promise((resolve, reject) => {
+        connection.query(queryString, function (error, results, fields) {
+            if (error) return reject(error);
+
+            resolve(results);
+        });
+    });
+};
+
+const getQuestionAnswerTable = (questionId?: string) => {
+    const queryString = questionId ?
+    `SELECT * FROM \`questionAnswer\` WHERE \`questionId\` = ${questionId}`
+    :
+    'SELECT * FROM `questionAnswer`';
+
+    return new Promise((resolve, reject) => {
+        connection.query(queryString, function (error, results, fields) {
             if (error) return reject(error);
 
             resolve(results);
@@ -36,10 +67,31 @@ const getSurveys = () => {
 };
 
 // define endpoint for getting surveys data
-app.get("/getSurveys", async (req, res, next) => {
-    const surveys: Array<{ id: number, name: string, stepContent: string, optionalSteps: string }> = await getSurveys() as any;
-
+app.post("/getSurveys", async (req, res, next) => {
+    const surveys: Survey[] = await getSurveyTable() as any;
     res.json(surveys);
+});
+
+app.post("/getQuestions", async (req, res, next) => {
+    const questions: Question[] = await getSurveyQuestionTable() as any;
+    res.json(questions);
+});
+
+app.post("/getAnswers", async (req, res, next) => {
+    const answers: Answer[] = await getQuestionAnswerTable() as any;
+    res.json(answers);
+});
+
+app.post("/getSurveyQuestions", async (req, res, next) => {
+    const surveyId = req.body;
+    const questions: Question[] = await getSurveyQuestionTable(surveyId) as any;
+    res.json(questions);
+});
+
+app.post("/getQuestionAnswers", async (req, res, next) => {
+    const questionId = req.body;
+    const answers: Answer[] = await getQuestionAnswerTable(questionId) as any;
+    res.json(answers);
 });
 
 // start the Express server

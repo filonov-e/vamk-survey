@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Container, Typography, Stepper, Step, StepLabel, Button, WithStyles, withStyles, Theme, createStyles } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
-import { AppContext } from './AppContext';
+import { AppContext } from '../services/AppContext';
 
 type Props = WithStyles<typeof styles>;
 
@@ -9,21 +9,27 @@ const Survey: React.FC<Props> = (props) => {
     const { classes } = props;
 
     const state = useContext(AppContext);
-    const { surveyId } = useParams();
+    const { surveys } = state;
+    const { surveyId } = useParams<{ surveyId: string }>();
 
-    const survey = state.surveys.find(survey => survey.id === Number(surveyId));
+    useEffect(() => {
+        state.loadSurveyQuestions(surveyId);
+    }, []);
 
-    const steps: string[] = (survey?.stepContent || []).map(_ => '');
+    const survey = surveys.find(survey => survey.id === Number(surveyId));
+    const questions = state.surveyQuestions;
+
+    const steps: string[] = questions.map(_ => '');
 
     const [activeStep, setActiveStep] = useState<number>(0);
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
     const getStepContent = (step: number) => {
-        return survey?.stepContent[step];
+        return questions[step].question;
     }
 
     const isStepOptional = (step: number) => {
-        return survey?.optionalSteps?.length && survey?.optionalSteps.includes(step);
+        return false;
     };
 
     const isStepSkipped = (step: number) => {
