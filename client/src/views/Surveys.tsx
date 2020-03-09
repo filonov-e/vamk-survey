@@ -10,9 +10,6 @@ const Surveys: React.FC<Props> = (props) => {
     const state = useContext(AppContext);
     const { surveys, isLoadingData } = state;
 
-    console.log(surveys);
-
-
     return (
         <Container>
             {isLoadingData ?
