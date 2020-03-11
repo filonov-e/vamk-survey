@@ -1,12 +1,9 @@
 import { Survey } from "common/types";
+import { db } from "../../services/firebase";
 
 export const getSurveys = async () => {
-    const response = await fetch("http://127.0.0.1:8080/getSurveys", {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-    });
-
-    const data: Survey[] = await response.json();
-    
-    return data;
+    const surveysRef = await db
+        .collection('surveys')
+        .get();
+    return surveysRef.docs.map(doc => doc.data()) as Survey[];
 };

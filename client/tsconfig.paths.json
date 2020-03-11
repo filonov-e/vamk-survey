@@ -1,10 +1,16 @@
 {
     "compilerOptions": {
-        "baseUrl": "src",
+        "baseUrl": ".",
+        "moduleResolution": "node",
         "paths": {
             "common/*": [
-                "../../common/*"
+                "../common/*",
+                "../common/services/*",
             ]
         }
-    }
+    },
+    "include": [
+        "./src/client/**/*",
+        "../../common/**/*"
+    ]
 }

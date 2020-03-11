@@ -1,3 +1,4 @@
+import * as firebase from "firebase";
 import React, { useState, useEffect } from "react";
 import { getSurveyQuestions } from "../common/db/questions";
 import { Survey, Question, Answer } from "common/types";
@@ -38,8 +39,9 @@ export const AppContextProvider = (props: any) => {
         loadSurveys();
     }, []);
 
-    const loadSurveys = () => {
+    const loadSurveys = async () => {
         setIsLoadingData(true);
+        
         getSurveys()
             .then((data) => {
                 setSurveys(data);
