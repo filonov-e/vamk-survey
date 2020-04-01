@@ -2,7 +2,7 @@ image: node:latest
 
 before_script:
   - cd client
-  - npm install
+  - yarn install
   - apt-get update -qy
   - apt-get install -y ruby-dev
   - gem install dpl
@@ -16,12 +16,12 @@ stages:
 build:
   stage: build
   script:
-    - CI=false npm run build
+    - CI=false yarn run build
 
 test:
   stage: test
   script:
-    - CI=false npm run test
+    - CI=false yarn run test
 
 staging:
   stage: staging
