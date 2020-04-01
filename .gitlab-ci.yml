@@ -7,6 +7,9 @@ before_script:
   - apt-get install -y ruby-dev
   - gem install dpl
 
+cache:
+  key: "$CI_JOB_NAME-$CI_COMMIT_REF_SLUG"
+
 stages:
   - build
   - test
@@ -26,7 +29,7 @@ test:
 staging:
   stage: staging
   script:
-    - dpl --provider=heroku --app=$HEROKU_APP_DEVELOPMENT --api-key=$HEROKU_API_KEY --skip_cleanup
+    - dpl --provider=heroku --app=$HEROKU_APP_DEVELOPMENT --api-key=$HEROKU_API_KEY
   only:
     - development
 
