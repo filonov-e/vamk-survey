@@ -26,13 +26,13 @@ test:
 staging:
   stage: staging
   script:
-    - dpl --provider=heroku --app=$HEROKU_APP_DEVELOPMENT --api-key=$HEROKU_API_KEY
+    - dpl --provider=heroku --app=$HEROKU_APP_DEVELOPMENT --api-key=$HEROKU_API_KEY --skip_cleanup
   only:
     - development
 
 production:
   stage: production
   script:
-    - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+    - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY --skip_cleanup
   only:
     - master
