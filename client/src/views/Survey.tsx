@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useLayoutEffect } from 'react';
+import React, { useState, useContext, useLayoutEffect } from 'react';
 import { Container, Typography, Stepper, Step, StepLabel, Button, WithStyles, withStyles, Theme, createStyles } from '@material-ui/core';
 import { useParams } from 'react-router-dom';
 import { AppContext } from '../services/AppContext';

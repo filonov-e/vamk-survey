@@ -1,4 +1,3 @@
-import * as firebase from "firebase";
 import React, { useState, useEffect } from "react";
 import { getSurveyQuestions } from "../common/db/questions";
 import { Survey, Question, Answer } from "common/types";
