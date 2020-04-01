@@ -2,6 +2,7 @@ image: node:latest
 
 before_script:
   - cd client
+  - npm install
   - apt-get update -qy
   - apt-get install -y ruby-dev
   - gem install dpl
