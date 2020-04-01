@@ -1,9 +1,9 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import Survey from "./views/Survey";
-import Home from "./views/Home";
-import Surveys from "./views/Surveys";
-import { AppContextProvider } from "./services/AppContext";
+import Survey from "views/Survey";
+import Home from "views/Home";
+import Surveys from "views/Surveys";
+import { AppContextProvider } from "services/AppContext";
 
 const AppRouter = () => {
     return (

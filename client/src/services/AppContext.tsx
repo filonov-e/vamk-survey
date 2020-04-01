@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { getSurveyQuestions } from "../common/db/questions";
+import { getSurveyQuestions } from "common/db/questions";
 import { Survey, Question, Answer } from "common/types";
-import { getSurveys } from "../common/db/surveys";
-import { getQuestionAnswers } from "../common/db/answers";
+import { getSurveys } from "common/db/surveys";
+import { getQuestionAnswers } from "common/db/answers";
 
 interface ContextState {
     isLoadingData: boolean;

@@ -1,5 +1,5 @@
 import { Question } from "common/types";
-import { db } from "../../services/firebase";
+import { db } from "services/firebase";
 
 export const getSurveyQuestions = async (surveyId: string) => {
     const surveyQuestionsRef = await db.collection('questions')

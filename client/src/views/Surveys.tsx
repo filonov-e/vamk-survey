@@ -1,12 +1,11 @@
 import React, { useContext } from 'react';
 import { WithStyles, createStyles, Theme, withStyles, List, ListItem, Typography, Container } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import { AppContext } from '../services/AppContext';
+import { AppContext } from 'services/AppContext';
 
 type Props = WithStyles<typeof styles>;
 
 const Surveys: React.FC<Props> = (props) => {
-    const { classes } = props;
     const state = useContext(AppContext);
     const { surveys, isLoadingData } = state;
 
