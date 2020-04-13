@@ -1,27 +1,20 @@
-import { Answer } from "common/types";
+import { AnswerApi } from "common/types";
+import { db } from "services/firebase";
 
 export const getAnswers = async () => {
-    const response = await fetch("http://127.0.0.1:8080/getAnswers", {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-    });
-
-    const data: Answer[] = await response.json();
-    
-    return data;
+    const questionsRef = await db.collection("answers").get();
+    return questionsRef.docs.map((doc) => doc.data()) as AnswerApi[];
 };
 
 export const getQuestionAnswers = async (questionId: string) => {
-    const response = await fetch("http://127.0.0.1:8080/getQuestionAnswers", {
-        method: 'POST', // *GET, POST, PUT, DELETE, etc.
-        mode: 'cors', // no-cors, *cors, same-origin
-        body: JSON.stringify({ questionId }),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    });
+    const questionAnswersRef = await db
+        .collection("answers")
+        .where("questionId", "==", questionId)
+        .get();
+    return questionAnswersRef.docs.map((doc) => doc.data()) as AnswerApi[];
+};
 
-    const data: Answer[] = await response.json();
-    
-    return data;
+export const updateAnswer = async (answerId: string, updatedAnswer: AnswerApi) => {
+    const answerRef = await db.collection("answers").doc(answerId);
+    answerRef.update(updatedAnswer);
 };

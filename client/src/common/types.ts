@@ -1,15 +1,17 @@
-export interface Survey {
+export interface SurveyApi {
     id: number;
     name: string;
+    questionIds: string[];
 }
 
-export interface Question {
+export interface QuestionApi {
     id: number;
     surveyId: number;
+    answerId: string;
     question: string;
 }
 
-export interface Answer {
+export interface AnswerApi {
     id: number;
     questionId: number;
     rating: number;

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { getSurveyQuestions } from "common/db/questions";
-import { Survey, Question, Answer } from "common/types";
+import { SurveyApi, QuestionApi, AnswerApi } from "common/types";
 import { getSurveys } from "common/db/surveys";
 import { getQuestionAnswers } from "common/db/answers";
 
 interface ContextState {
     isLoadingData: boolean;
-    surveys: Survey[];
-    surveyQuestions: Question[];
-    questionAnswers: Answer[];
+    surveys: SurveyApi[];
+    surveyQuestions: QuestionApi[];
+    questionAnswers: AnswerApi[];
     loadSurveys: () => void;
     loadSurveyQuestions: (surveyId: string) => void;
     loadQuestionAnswers: (questionId: string) => void;
@@ -21,16 +21,16 @@ const INITIAL_STATE: ContextState = {
     questionAnswers: [],
     loadSurveys: () => {},
     loadSurveyQuestions: () => {},
-    loadQuestionAnswers: () => {}
-}
+    loadQuestionAnswers: () => {},
+};
 
 export const AppContext = React.createContext<ContextState>(INITIAL_STATE);
 
 export const AppContextProvider = (props: any) => {
     const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
-    const [surveys, setSurveys] = useState<Survey[]>([]);
-    const [surveyQuestions, setSurveyQuestions] = useState<Question[]>([]);
-    const [questionAnswers, setQuestionAnswers] = useState<Answer[]>([]);
+    const [surveys, setSurveys] = useState<SurveyApi[]>([]);
+    const [surveyQuestions, setSurveyQuestions] = useState<QuestionApi[]>([]);
+    const [questionAnswers, setQuestionAnswers] = useState<AnswerApi[]>([]);
 
     const { children }: { children: any } = props;
 
@@ -40,31 +40,28 @@ export const AppContextProvider = (props: any) => {
 
     const loadSurveys = async () => {
         setIsLoadingData(true);
-        
-        getSurveys()
-            .then((data) => {
-                setSurveys(data);
-                setIsLoadingData(false);
-            });
-    }
+
+        getSurveys().then((data) => {
+            setSurveys(data);
+            setIsLoadingData(false);
+        });
+    };
 
     const loadSurveyQuestions = (surveyId: string) => {
         setIsLoadingData(true);
-        getSurveyQuestions(surveyId)
-            .then((data) => {
-                setSurveyQuestions(data);
-                setIsLoadingData(false);
-            });
-    }
+        getSurveyQuestions(surveyId).then((data) => {
+            setSurveyQuestions(data);
+            setIsLoadingData(false);
+        });
+    };
 
     const loadQuestionAnswers = (questionId: string) => {
         setIsLoadingData(true);
-        getQuestionAnswers(questionId)
-            .then((data) => {
-                setQuestionAnswers(data);
-                setIsLoadingData(false);
-            });
-    }
+        getQuestionAnswers(questionId).then((data) => {
+            setQuestionAnswers(data);
+            setIsLoadingData(false);
+        });
+    };
 
     return (
         <AppContext.Provider
@@ -75,7 +72,7 @@ export const AppContextProvider = (props: any) => {
                 questionAnswers,
                 loadSurveys,
                 loadSurveyQuestions,
-                loadQuestionAnswers
+                loadQuestionAnswers,
             }}
         >
             {children}
