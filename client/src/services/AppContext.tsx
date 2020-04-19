@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { getSurveyQuestions } from "common/db/questions";
 import { SurveyApi, QuestionApi, AnswerApi } from "common/types";
 import { getSurveys } from "common/db/surveys";
-import { getQuestionAnswers } from "common/db/answers";
+import { getSurveyQuestions } from "common/db/questions";
+import { getQuestionAnswer } from "common/db/answers";
 
 interface ContextState {
     isLoadingData: boolean;
     surveys: SurveyApi[];
     surveyQuestions: QuestionApi[];
-    questionAnswers: AnswerApi[];
+    questionAnswer?: AnswerApi;
     loadSurveys: () => void;
     loadSurveyQuestions: (surveyId: string) => void;
-    loadQuestionAnswers: (questionId: string) => void;
+    loadQuestionAnswer: (questionId: string) => void;
 }
 
 const INITIAL_STATE: ContextState = {
     isLoadingData: false,
     surveys: [],
     surveyQuestions: [],
-    questionAnswers: [],
+    questionAnswer: undefined,
     loadSurveys: () => {},
     loadSurveyQuestions: () => {},
-    loadQuestionAnswers: () => {},
+    loadQuestionAnswer: () => {}
 };
 
 export const AppContext = React.createContext<ContextState>(INITIAL_STATE);
@@ -30,7 +30,7 @@ export const AppContextProvider = (props: any) => {
     const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
     const [surveys, setSurveys] = useState<SurveyApi[]>([]);
     const [surveyQuestions, setSurveyQuestions] = useState<QuestionApi[]>([]);
-    const [questionAnswers, setQuestionAnswers] = useState<AnswerApi[]>([]);
+    const [questionAnswer, setQuestionAnswer] = useState<AnswerApi>();
 
     const { children }: { children: any } = props;
 
@@ -54,10 +54,10 @@ export const AppContextProvider = (props: any) => {
         });
     };
 
-    const loadQuestionAnswers = (questionId: string) => {
+    const loadQuestionAnswer = (questionId: string) => {
         setIsLoadingData(true);
-        getQuestionAnswers(questionId).then((data) => {
-            setQuestionAnswers(data);
+        getQuestionAnswer(questionId).then((data) => {
+            setQuestionAnswer(data);
             setIsLoadingData(false);
         });
     };
@@ -72,10 +72,10 @@ export const AppContextProvider = (props: any) => {
                 isLoadingData,
                 surveys,
                 surveyQuestions,
-                questionAnswers,
+                questionAnswer,
                 loadSurveys,
                 loadSurveyQuestions,
-                loadQuestionAnswers,
+                loadQuestionAnswer
             }}
         >
             {children}
