@@ -40,7 +40,6 @@ export const AppContextProvider = (props: any) => {
 
     const loadSurveys = async () => {
         setIsLoadingData(true);
-
         getSurveys().then((data) => {
             setSurveys(data);
             setIsLoadingData(false);
@@ -62,6 +61,10 @@ export const AppContextProvider = (props: any) => {
             setIsLoadingData(false);
         });
     };
+
+    const updateQuestionAnswer = (questionId: string) => {
+        
+    }
 
     return (
         <AppContext.Provider
