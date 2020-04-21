@@ -2,7 +2,6 @@ import * as firebase from 'firebase/app';
 import "firebase/firestore";
 import "firebase/functions";
 
-console.log(process.env.REACT_APP_FIREBASE_PROJECT_ID);
 const firebaseProjectId = process.env.REACT_APP_FIREBASE_PROJECT_ID || "";
 
 const firebaseConfig = {

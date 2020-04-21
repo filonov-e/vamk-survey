@@ -1,9 +1,9 @@
-import { QuestionApi } from "common/types";
+import { DbQuestionApi } from "common/types";
 import { db } from "services/firebase";
 
 export const getSurveyQuestions = async (surveyId: string) => {
     const surveyQuestionsRef = await db.collection('questions')
         .where('surveyId', '==', surveyId)
         .get();
-    return surveyQuestionsRef.docs.map(doc => doc.data()) as QuestionApi[];
+    return surveyQuestionsRef.docs.map(doc => doc.data()) as DbQuestionApi[];
 };

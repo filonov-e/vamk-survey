@@ -12,7 +12,6 @@ import {
     Drawer,
     List,
     ListItem,
-    Dialog,
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import { Link } from "react-router-dom";
@@ -42,9 +41,7 @@ const TopBar: React.FC<Props> = ({ ...props }) => {
         setIsLoginDialogOpen(false);
     };
 
-    const handleSubmitLoginDialog = (login: string, password: string) => {
-        
-    };
+    const handleSubmitLoginDialog = (login: string, password: string) => {};
 
     return (
         <div>

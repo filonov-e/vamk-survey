@@ -11,8 +11,8 @@ import {
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../services/AppContext";
-import { updateSurvey } from "common/db/surveys";
-import { SurveyApi, AnswerApi } from "common/types";
+import { AnswerApi } from "common/types";
+import { updateAnswer } from "common/db/answers";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,7 +41,7 @@ const Survey: React.FC = () => {
         state.loadSurveyQuestions(surveyId);
     });
 
-    const survey = surveys.find((survey) => survey.id === Number(surveyId));
+    const survey = surveys.find((survey) => survey.id === surveyId);
     const questions = state.surveyQuestions;
 
     const steps: string[] = questions.map((_) => "");
@@ -98,25 +98,40 @@ const Survey: React.FC = () => {
 
     const handleFinish = () => {
         handleNext();
-        handleUpdateAnswer();
+        handleSubmitAnswers();
     };
 
-    const handleUpdateAnswer = () => {
-        const questionsIds = questions.map((question) => question.id);
-
-        // const updatedSurveyAnswers: AnswerApi = {
-        //     id: ,
-        //     name
-        // };
-
-        // updateAnswer(surveyId, );
-    };
-
-    const handleRatingChange = (
+    const handleUpdateAnswer = (
         event: React.ChangeEvent<{}>,
         value: number | number[]
     ) => {
-        // setAnswers((value as unknown) as number);
+        const questionId = questions[activeStep].id;
+
+        const updatedAnswer: AnswerApi = {
+            questionId,
+            rating: value as number,
+        };
+
+        const updatedAnswers = [
+            ...answers.filter((answer) => answer.questionId !== questionId),
+            updatedAnswer,
+        ];
+        setAnswers(updatedAnswers);
+    };
+
+    const handleSubmitAnswers = () => {
+        answers.forEach((answer) => {
+            updateAnswer(answer);
+        });
+    };
+
+    const getActiveAnswer = () => {
+        if (activeStep >= questions.length) {
+            return undefined;
+        }
+        return answers.find(
+            (answer) => answer.questionId === questions[activeStep].id
+        );
     };
 
     return (
@@ -135,8 +150,8 @@ const Survey: React.FC = () => {
                         stepProps.completed = false;
                     }
                     return (
-                        <React.Fragment>
-                            <Step key={label} {...stepProps}>
+                        <React.Fragment key={label}>
+                            <Step {...stepProps}>
                                 <StepLabel {...labelProps}>{label}</StepLabel>
                             </Step>
                         </React.Fragment>
@@ -170,6 +185,8 @@ const Survey: React.FC = () => {
                                 min={1}
                                 max={5}
                                 className={classes.slider}
+                                onChangeCommitted={handleUpdateAnswer}
+                                value={getActiveAnswer()?.rating || 3}
                             />
                         </div>
                         <div>
