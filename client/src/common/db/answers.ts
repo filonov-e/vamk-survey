@@ -1,9 +1,9 @@
 import { AnswerApi, DbAnswerApi } from "common/types";
 import { db } from "services/firebase";
 
-export const getAnswers = async (answerIds: string[]) => {
-    const questionsRef = await db.collection("answers").where('id', 'in', answerIds).get();
-    return questionsRef.docs.map((doc) => doc.data()) as DbAnswerApi[];
+export const getAnswers = async () => {
+    const answersRef = await db.collection("answers").get();
+    return answersRef.docs.map((doc) => doc.data()) as DbAnswerApi[];
 };
 
 export const getQuestionAnswer = async (questionId: string) => {
