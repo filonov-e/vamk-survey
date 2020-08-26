@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { DbQuestionApi, DbAnswerApi, DbSurveyApi } from "common/types";
 import { getSurveys } from "common/db/surveys";
 import { getSurveyQuestions } from "common/db/questions";
 import { getQuestionAnswer } from "common/db/answers";
+import { SurveyApi, QuestionApi, AnswerApi } from "common/types";
 
 interface ContextState {
     isLoadingData: boolean;
-    surveys: DbSurveyApi[];
-    surveyQuestions: DbQuestionApi[];
-    questionAnswer?: DbAnswerApi;
+    surveys: SurveyApi[];
+    surveyQuestions: QuestionApi[];
+    questionAnswer?: AnswerApi;
     loadSurveys: () => void;
     loadSurveyQuestions: (surveyId: string) => void;
     loadQuestionAnswer: (questionId: string) => void;
@@ -21,16 +21,16 @@ const INITIAL_STATE: ContextState = {
     questionAnswer: undefined,
     loadSurveys: () => {},
     loadSurveyQuestions: () => {},
-    loadQuestionAnswer: () => {}
+    loadQuestionAnswer: () => {},
 };
 
 export const AppContext = React.createContext<ContextState>(INITIAL_STATE);
 
 export const AppContextProvider = (props: any) => {
     const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
-    const [surveys, setSurveys] = useState<DbSurveyApi[]>([]);
-    const [surveyQuestions, setSurveyQuestions] = useState<DbQuestionApi[]>([]);
-    const [questionAnswer, setQuestionAnswer] = useState<DbAnswerApi>();
+    const [surveys, setSurveys] = useState<SurveyApi[]>([]);
+    const [surveyQuestions, setSurveyQuestions] = useState<QuestionApi[]>([]);
+    const [questionAnswer, setQuestionAnswer] = useState<AnswerApi>();
 
     const { children }: { children: any } = props;
 
@@ -71,7 +71,7 @@ export const AppContextProvider = (props: any) => {
                 questionAnswer,
                 loadSurveys,
                 loadSurveyQuestions,
-                loadQuestionAnswer
+                loadQuestionAnswer,
             }}
         >
             {children}

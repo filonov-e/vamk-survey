@@ -28,7 +28,7 @@ const Surveys: React.FC = () => {
 
     return (
         <Container>
-            <Button onClick={openAddSurveyDialog}>Add survey</Button>
+            <Link to='/addSurvey'>Add survey</Link>
             {isLoadingData ? (
                 <Typography variant="h5">Loading...</Typography>
             ) : (

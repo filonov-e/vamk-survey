@@ -10,6 +10,8 @@ import {
     Stepper,
     Step,
     StepLabel,
+    StepContent,
+    makeStyles,
 } from "@material-ui/core";
 import { QuestionApi, SurveyApi } from "common/types";
 
@@ -21,28 +23,49 @@ interface OwnProps {
 
 type Props = OwnProps;
 
-const SURVEY_INITIAL_STATE: SurveyApi = {
+const SURVEY_INITIAL_STATE: Omit<SurveyApi, "id"> = {
     name: "New Survey",
 };
 
-const QUESTION_INITIAL_STATE: QuestionApi = {
+const QUESTION_INITIAL_STATE: Omit<QuestionApi, "id" | "surveyId"> = {
     question: "Test question",
-    surveyId: "",
 };
 
 const AddSurveyDialog: React.FC<Props> = (props) => {
+    const classes = useStyles();
     const { open, onClose, onSubmit } = props;
-    const [survey, setSurvey] = useState<SurveyApi>(SURVEY_INITIAL_STATE);
-    const [questions, setQuestions] = useState<QuestionApi[]>([]);
+    const [survey, setSurvey] = useState<Omit<SurveyApi, "id">>(
+        SURVEY_INITIAL_STATE
+    );
+    const [questions, setQuestions] = useState<
+        Omit<QuestionApi, "id" | "surveyId">[]
+    >([]);
     const [activeStep, setActiveStep] = useState<number>(0);
 
     const handleBack = () => {
         setActiveStep((prevActiveStep) => prevActiveStep - 1);
     };
 
+    const handleNext = () => {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    };
+
     const handleAddQuestion = () => {
         setQuestions(() => [...questions, QUESTION_INITIAL_STATE]);
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        setActiveStep(questions.length);
+    };
+
+    const handleQuestionChange = (index: number) => {
+        return (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+            const { value } = event.target;
+            const updatedQuestion = {
+                ...questions[index],
+                question: value,
+            };
+            let updatedQuestions = questions.slice();
+            updatedQuestions[index] = updatedQuestion;
+            setQuestions(updatedQuestions);
+        };
     };
 
     return (
@@ -52,19 +75,31 @@ const AddSurveyDialog: React.FC<Props> = (props) => {
                 <DialogContentText>
                     Enter data for the new survey
                 </DialogContentText>
-                <Stepper activeStep={activeStep}>
-                    {questions.map((questionItem) => {
+                <Stepper orientation="vertical">
+                    {questions.map((questionItem, index) => {
                         const { question } = questionItem;
                         return (
-                            <Step key={question}>
-                                <StepLabel>{question}</StepLabel>
+                            <Step key={index} active>
+                                <StepLabel>{index + 1}</StepLabel>
+                                <StepContent>
+                                    <TextField
+                                        value={question}
+                                        onChange={handleQuestionChange(index)}
+                                    />
+                                </StepContent>
                             </Step>
                         );
                     })}
                 </Stepper>
-                <DialogActions>
+                <DialogActions className={classes.dialogActions}>
                     <Button disabled={activeStep === 0} onClick={handleBack}>
                         Back
+                    </Button>
+                    <Button
+                        disabled={activeStep === questions.length}
+                        onClick={handleNext}
+                    >
+                        Next
                     </Button>
                     <Button onClick={handleAddQuestion}>+ Add</Button>
                 </DialogActions>
@@ -72,5 +107,13 @@ const AddSurveyDialog: React.FC<Props> = (props) => {
         </Dialog>
     );
 };
+
+const useStyles = makeStyles((theme) => ({
+    dialogActions: {
+        position: "absolute",
+        bottom: 8,
+        left: 64,
+    },
+}));
 
 export default AddSurveyDialog;

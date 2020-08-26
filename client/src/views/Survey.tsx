@@ -11,24 +11,8 @@ import {
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
 import { AppContext } from "../services/AppContext";
-import { AnswerApi } from "common/types";
+import { AnswerApi, AnswerRating } from "common/types";
 import { updateAnswer } from "common/db/answers";
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: "100%",
-    },
-    button: {
-        marginRight: theme.spacing(1),
-    },
-    instructions: {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-    },
-    slider: {
-        width: 300,
-    },
-}));
 
 const Survey: React.FC = () => {
     const classes = useStyles();
@@ -106,8 +90,13 @@ const Survey: React.FC = () => {
         value: number | number[]
     ) => {
         const questionId = questions[activeStep].id;
+        const answerToUpdate = answers.find(
+            (a) => a.questionId === questionId
+        ) as AnswerRating;
 
         const updatedAnswer: AnswerApi = {
+            ...answerToUpdate,
+            type: "rating",
             questionId,
             rating: value as number,
         };
@@ -186,7 +175,10 @@ const Survey: React.FC = () => {
                                 max={5}
                                 className={classes.slider}
                                 onChangeCommitted={handleUpdateAnswer}
-                                value={getActiveAnswer()?.rating || 3}
+                                value={
+                                    (getActiveAnswer() as AnswerRating)
+                                        ?.rating || 3
+                                }
                             />
                         </div>
                         <div>
@@ -233,5 +225,21 @@ const Survey: React.FC = () => {
         </Container>
     );
 };
+
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: "100%",
+    },
+    button: {
+        marginRight: theme.spacing(1),
+    },
+    instructions: {
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+    },
+    slider: {
+        width: 300,
+    },
+}));
 
 export default Survey;
