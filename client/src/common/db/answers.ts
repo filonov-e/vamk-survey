@@ -23,11 +23,9 @@ export const getAnswerById = async (answerId: string) => {
 };
 
 export const updateAnswer = async (updatedAnswer: AnswerApi) => {
-    const answerRef = await db.collection("answers").doc();
-    answerRef.set({
-        ...updatedAnswer,
-        id: answerRef.id,
-    });
+    const { id } = updatedAnswer;
+    const answerRef = await db.collection("answers").doc(id);
+    answerRef.set(updatedAnswer);
 };
 
 export const getNewAnswerId = async () => {

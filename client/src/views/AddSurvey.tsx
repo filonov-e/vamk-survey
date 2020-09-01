@@ -1,5 +1,5 @@
 import React, { useEffect, useState, ChangeEvent } from "react";
-import { getNewSurveyId } from "common/db/surveys";
+import { getNewSurveyId, updateSurvey } from "common/db/surveys";
 import { QuestionApi, AnswerApi, AnswerType } from "common/types";
 import {
     Button,
@@ -16,6 +16,7 @@ import classNames from "classnames";
 
 const AddSurvey = () => {
     const [surveyId, setSurveyId] = useState<string>("");
+    const [surveyName, setSurveyName] = useState<string>();
     const [questions, setQuestions] = useState<QuestionApi[]>([]);
     const [answers, setAnswers] = useState<AnswerApi[]>([]);
     const [activeQuestionIndex, setActiveQuestionIndex] = useState<number>(0);
@@ -48,30 +49,32 @@ const AddSurvey = () => {
         ]);
     };
 
-    // const handleQestionChange = (
-    //     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    // ) => {
-    //     const { value } = event.target;
-    //     setQuestions((prevQuestions) => {
-    //         const temp = [...prevQuestions];
-    //         temp[activeStep].question = value;
-    //         return temp;
-    //     });
-    // };
+    const handleQuestionChange = (
+        event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { value } = event.target;
+        setQuestions((prevQuestions) => {
+            const temp = [...prevQuestions];
+            temp[activeQuestionIndex].question = value;
+            return temp;
+        });
+    };
 
-    const handleAddAnswer = (type: AnswerType) => {
+    const handleAddAnswer = async (type: AnswerType) => {
+        const newAnswerId = await getNewAnswerId();
         setAnswerSelectionDialogOpen(false);
         switch (type) {
             case "rating":
-                handleAddAnswerRating();
+                handleAddAnswerRating(newAnswerId);
                 break;
+            case "text":
+                handleAddAnswerText(newAnswerId);
             default:
                 break;
         }
     };
 
-    const handleAddAnswerRating = async () => {
-        const newAnswerId = await getNewAnswerId();
+    const handleAddAnswerRating = async (newAnswerId: string) => {
         setAnswers((prevAnswers) => [
             ...prevAnswers,
             {
@@ -83,9 +86,32 @@ const AddSurvey = () => {
         ]);
     };
 
+    const handleAddAnswerText = async (newAnswerId: string) => {
+        setAnswers((prevAnswers) => [
+            ...prevAnswers,
+            {
+                id: newAnswerId,
+                type: "text",
+                questionId: activeQuestion.id,
+                text: "",
+            },
+        ]);
+    };
+
     const openAnswerSelectionDialog = () => {
         setAnswerSelectionDialogOpen(true);
     };
+
+    const handleQuestionIndexChange = (
+        event: React.ChangeEvent<unknown>,
+        page: number
+    ) => {
+        setActiveQuestionIndex(page - 1);
+    };
+
+    const handleSaveSurvey = () => {
+        // updateSurvey({ id: surveyId, name:  });
+    }
 
     return (
         <Container>
@@ -96,6 +122,7 @@ const AddSurvey = () => {
                 }}
                 count={questions.length}
                 shape="rounded"
+                onChange={handleQuestionIndexChange}
             />
             {questions.length === 0 && (
                 <Typography
@@ -108,9 +135,10 @@ const AddSurvey = () => {
             )}
             {questions.length > 0 && (
                 <TextField
-                    // onChange={handleQestionChange}
+                    onChange={handleQuestionChange}
                     placeholder="Enter question"
                     value={activeQuestion.question}
+                    multiline
                 />
             )}
             <div className={classes.addQuestionButtonContainer}>
@@ -136,6 +164,7 @@ const AddSurvey = () => {
                 open={answerSelectionDialogOpen}
                 onSelect={handleAddAnswer}
             />
+            <Button disabled={questions.length > 0} onClick={handleSaveSurvey}>Save survey</Button>
         </Container>
     );
 };

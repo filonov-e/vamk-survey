@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
     List,
     ListItem,
@@ -7,12 +7,16 @@ import {
     Button,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import { AppContext } from "services/AppContext";
 import AddSurveyDialog from "components/AddSurveyDialog";
+import { getSurveys } from "redux/selectors/surveysSelectors";
+import { useSelector, useDispatch } from "react-redux";
+import { updateActiveSurvey } from "redux/slices/activeSurveySlices";
+import { SurveyApi } from "common/types";
 
 const Surveys: React.FC = () => {
-    const state = useContext(AppContext);
-    const { surveys, isLoadingData } = state;
+    const surveys = useSelector(getSurveys);
+
+    const dispatch = useDispatch();
 
     const [isAddSurveyDialogOpen, setIsAddSurveyDialogOpen] = useState<boolean>(
         false
@@ -26,21 +30,28 @@ const Surveys: React.FC = () => {
         setIsAddSurveyDialogOpen(false);
     };
 
+    const handleUpdateActiveSurvey = (survey: SurveyApi) => {
+        dispatch(updateActiveSurvey(survey));
+    };
+
     return (
         <Container>
-            <Link to='/addSurvey'>Add survey</Link>
-            {isLoadingData ? (
+            <Link to="/addSurvey">Add survey</Link>
+            {surveys.loading ? (
                 <Typography variant="h5">Loading...</Typography>
             ) : (
                 <List>
-                    {surveys.map((survey) => (
-                        <Link to={`/surveys/${survey.id}`} key={survey.id}>
+                    {surveys.data?.map((survey) => (
+                        <Link
+                            onClick={() => handleUpdateActiveSurvey(survey)}
+                            to={`/surveys/${survey.id}`}
+                            key={survey.id}
+                        >
                             <ListItem button>{survey.name}</ListItem>
                         </Link>
                     ))}
                 </List>
             )}
-            <AddSurveyDialog open={isAddSurveyDialogOpen} onClose={closeAddSurveyDialog} onSubmit={() => {}} />
         </Container>
     );
 };

@@ -13,29 +13,48 @@ import { useParams } from "react-router-dom";
 import { AppContext } from "../services/AppContext";
 import { AnswerApi, AnswerRating } from "common/types";
 import { updateAnswer } from "common/db/answers";
+import { useDispatch, useSelector } from "react-redux";
+import { updateActiveSurvey } from "redux/slices/activeSurveySlices";
+import { getActiveSurvey } from "redux/selectors/activeSurveySelectors";
+import { getActiveSurveyQuestions } from "redux/selectors/activeSurveyQuestionsSelectors";
+import { fetchActiveSurveyQuestions } from "redux/slices/activeSurveyQuestionsSlices";
+import { getSurveys } from "redux/selectors/surveysSelectors";
 
 const Survey: React.FC = () => {
     const classes = useStyles();
 
-    const state = useContext(AppContext);
-    const { surveys } = state;
+    const surveys = useSelector(getSurveys);
+    const activeSurveyQuestions = useSelector(getActiveSurveyQuestions);
+
+    const dispatch = useDispatch();
+
     const { surveyId } = useParams<{ surveyId: string }>();
 
+    const activeSurveyData = surveys.data?.find((s) => s.id === surveyId);
+    const questionsData = activeSurveyQuestions.data ?? [];
+
     useEffect(() => {
-        state.loadSurveyQuestions(surveyId);
-    });
+        activeSurveyData && dispatch(updateActiveSurvey(activeSurveyData));
+    }, [activeSurveyData]);
 
-    const survey = surveys.find((survey) => survey.id === surveyId);
-    const questions = state.surveyQuestions;
+    useEffect(() => {
+        dispatch(fetchActiveSurveyQuestions(surveyId));
+    }, [surveyId]);
 
-    const steps: string[] = questions.map((_) => "");
+    useEffect(() => {
+        return () => {
+            dispatch(updateActiveSurvey(null));
+        };
+    }, []);
+
+    const steps: string[] = questionsData.map((_) => "");
 
     const [activeStep, setActiveStep] = useState<number>(0);
     const [skipped, setSkipped] = useState(new Set<number>());
     const [answers, setAnswers] = useState<AnswerApi[]>([]);
 
     const getStepContent = (step: number) => {
-        return questions[step].question;
+        return questionsData[step].question;
     };
 
     const isStepOptional = (step: number) => {
@@ -89,7 +108,7 @@ const Survey: React.FC = () => {
         event: React.ChangeEvent<{}>,
         value: number | number[]
     ) => {
-        const questionId = questions[activeStep].id;
+        const questionId = questionsData[activeStep].id;
         const answerToUpdate = answers.find(
             (a) => a.questionId === questionId
         ) as AnswerRating;
@@ -115,17 +134,17 @@ const Survey: React.FC = () => {
     };
 
     const getActiveAnswer = () => {
-        if (activeStep >= questions.length) {
+        if (activeStep >= questionsData.length) {
             return undefined;
         }
         return answers.find(
-            (answer) => answer.questionId === questions[activeStep].id
+            (answer) => answer.questionId === questionsData[activeStep].id
         );
     };
 
     return (
         <Container>
-            <Typography variant="h4">{survey?.name}</Typography>
+            <Typography variant="h4">{activeSurveyData?.name}</Typography>
             <Stepper activeStep={activeStep}>
                 {steps.map((label, index) => {
                     const stepProps: { completed?: boolean } = {};

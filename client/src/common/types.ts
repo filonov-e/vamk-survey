@@ -1,3 +1,5 @@
+import { SerializedError } from "@reduxjs/toolkit";
+
 export interface SurveyApi {
     id: string;
     name: string;
@@ -28,6 +30,12 @@ export interface AnswerText extends AnswerApiBase {
 }
 
 export type AnswerType = "rating" | "text";
+
+export type Loading<T> = {
+    loading: boolean;
+    data: T | null;
+    error: SerializedError | null;
+};
 
 // export interface DbSurveyApi extends SurveyApi {
 //     id: string;
