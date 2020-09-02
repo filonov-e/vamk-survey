@@ -10,7 +10,6 @@ import {
     Slider,
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import { AppContext } from "../services/AppContext";
 import { AnswerApi, AnswerRating } from "common/types";
 import { updateAnswer } from "common/db/answers";
 import { useDispatch, useSelector } from "react-redux";
