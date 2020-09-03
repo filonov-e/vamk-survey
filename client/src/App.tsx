@@ -18,7 +18,7 @@ const App = (props: Props) => {
     useEffect(() => {
         dispatch(fetchSurveys());
         dispatch(updateActiveSurvey(null));
-    }, []);
+    }, [dispatch]);
 
     return (
         <div className={classes.root}>

@@ -3,12 +3,15 @@ import { SerializedError } from "@reduxjs/toolkit";
 export interface SurveyApi {
     id: string;
     name: string;
+    created: string;
 }
 
 export interface QuestionApi {
     id: string;
     surveyId: string;
+    created: string;
     question: string;
+    answerType: AnswerType;
 }
 
 export type AnswerApi = AnswerRating | AnswerText;
@@ -16,6 +19,7 @@ export type AnswerApi = AnswerRating | AnswerText;
 export interface AnswerApiBase {
     id: string;
     questionId: string;
+    created: string;
     type: AnswerType;
 }
 

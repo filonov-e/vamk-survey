@@ -1,4 +1,4 @@
-import { SurveyApi, Loading, QuestionApi } from "common/types";
+import { Loading, QuestionApi } from "common/types";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { getSurveyQuestions } from "common/db/questions";
 

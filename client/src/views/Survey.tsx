@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Container,
     Typography,
@@ -10,11 +10,10 @@ import {
     Slider,
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import { AnswerApi, AnswerRating } from "common/types";
-import { updateAnswer } from "common/db/answers";
+import { AnswerApi, AnswerRating, QuestionApi } from "common/types";
+import { updateAnswer, getNewAnswerId } from "common/db/answers";
 import { useDispatch, useSelector } from "react-redux";
 import { updateActiveSurvey } from "redux/slices/activeSurveySlices";
-import { getActiveSurvey } from "redux/selectors/activeSurveySelectors";
 import { getActiveSurveyQuestions } from "redux/selectors/activeSurveyQuestionsSelectors";
 import { fetchActiveSurveyQuestions } from "redux/slices/activeSurveyQuestionsSlices";
 import { getSurveys } from "redux/selectors/surveysSelectors";
@@ -32,25 +31,57 @@ const Survey: React.FC = () => {
     const activeSurveyData = surveys.data?.find((s) => s.id === surveyId);
     const questionsData = activeSurveyQuestions.data ?? [];
 
-    useEffect(() => {
-        activeSurveyData && dispatch(updateActiveSurvey(activeSurveyData));
-    }, [activeSurveyData]);
-
-    useEffect(() => {
-        dispatch(fetchActiveSurveyQuestions(surveyId));
-    }, [surveyId]);
-
-    useEffect(() => {
-        return () => {
-            dispatch(updateActiveSurvey(null));
-        };
-    }, []);
-
     const steps: string[] = questionsData.map((_) => "");
 
     const [activeStep, setActiveStep] = useState<number>(0);
     const [skipped, setSkipped] = useState(new Set<number>());
     const [answers, setAnswers] = useState<AnswerApi[]>([]);
+
+    useEffect(() => {
+        activeSurveyData && dispatch(updateActiveSurvey(activeSurveyData));
+    }, [dispatch, activeSurveyData]);
+
+    useEffect(() => {
+        const initializeAnswers = async (questionsData: QuestionApi[]) => {
+            for (let i = 0; i < questionsData.length; i++) {
+                const currentQuestion = questionsData[i];
+                const newId = await getNewAnswerId();
+                const questionId = currentQuestion.id;
+                const type = currentQuestion.answerType;
+                const created = new Date().toISOString();
+
+                setAnswers((prevAnswers) => [
+                    ...prevAnswers,
+                    type === "rating"
+                        ? {
+                              id: newId,
+                              questionId,
+                              created,
+                              type,
+                              rating: 0,
+                          }
+                        : {
+                              id: newId,
+                              questionId,
+                              created,
+                              type,
+                              text: "",
+                          },
+                ]);
+            }
+        };
+        initializeAnswers(questionsData);
+    }, [questionsData]);
+
+    useEffect(() => {
+        dispatch(fetchActiveSurveyQuestions(surveyId));
+    }, [dispatch, surveyId]);
+
+    useEffect(() => {
+        return () => {
+            dispatch(updateActiveSurvey(null));
+        };
+    }, [dispatch]);
 
     const getStepContent = (step: number) => {
         return questionsData[step].question;
@@ -108,13 +139,15 @@ const Survey: React.FC = () => {
         value: number | number[]
     ) => {
         const questionId = questionsData[activeStep].id;
+        const questionAnswerType = questionsData[activeStep].answerType;
+
         const answerToUpdate = answers.find(
             (a) => a.questionId === questionId
         ) as AnswerRating;
 
-        const updatedAnswer: AnswerApi = {
+        const updatedAnswer: AnswerRating = {
             ...answerToUpdate,
-            type: "rating",
+            type: questionAnswerType as "rating",
             questionId,
             rating: value as number,
         };
@@ -133,9 +166,6 @@ const Survey: React.FC = () => {
     };
 
     const getActiveAnswer = () => {
-        if (activeStep >= questionsData.length) {
-            return undefined;
-        }
         return answers.find(
             (answer) => answer.questionId === questionsData[activeStep].id
         );
@@ -157,11 +187,9 @@ const Survey: React.FC = () => {
                         stepProps.completed = false;
                     }
                     return (
-                        <React.Fragment key={label}>
-                            <Step {...stepProps}>
-                                <StepLabel {...labelProps}>{label}</StepLabel>
-                            </Step>
-                        </React.Fragment>
+                        <Step key={questionsData[index].id} {...stepProps}>
+                            <StepLabel {...labelProps}>{label}</StepLabel>
+                        </Step>
                     );
                 })}
             </Stepper>
@@ -184,7 +212,6 @@ const Survey: React.FC = () => {
                             {getStepContent(activeStep)}
                         </Typography>
                         <div>
-                            {/* todo slider */}
                             <Slider
                                 valueLabelDisplay="auto"
                                 step={1}
@@ -195,7 +222,7 @@ const Survey: React.FC = () => {
                                 onChangeCommitted={handleUpdateAnswer}
                                 value={
                                     (getActiveAnswer() as AnswerRating)
-                                        ?.rating || 3
+                                        ?.rating ?? 3
                                 }
                             />
                         </div>

@@ -1,13 +1,6 @@
-import React, { useContext, useState, useEffect } from "react";
-import {
-    List,
-    ListItem,
-    Typography,
-    Container,
-    Button,
-} from "@material-ui/core";
+import React from "react";
+import { List, ListItem, Typography, Container } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import AddSurveyDialog from "components/AddSurveyDialog";
 import { getSurveys } from "redux/selectors/surveysSelectors";
 import { useSelector, useDispatch } from "react-redux";
 import { updateActiveSurvey } from "redux/slices/activeSurveySlices";
@@ -18,25 +11,13 @@ const Surveys: React.FC = () => {
 
     const dispatch = useDispatch();
 
-    const [isAddSurveyDialogOpen, setIsAddSurveyDialogOpen] = useState<boolean>(
-        false
-    );
-
-    const openAddSurveyDialog = () => {
-        setIsAddSurveyDialogOpen(true);
-    };
-
-    const closeAddSurveyDialog = () => {
-        setIsAddSurveyDialogOpen(false);
-    };
-
     const handleUpdateActiveSurvey = (survey: SurveyApi) => {
         dispatch(updateActiveSurvey(survey));
     };
 
     return (
         <Container>
-            <Link to="/addSurvey">Add survey</Link>
+            <Link to="/addSurvey/start">Add survey</Link>
             {surveys.loading ? (
                 <Typography variant="h5">Loading...</Typography>
             ) : (
