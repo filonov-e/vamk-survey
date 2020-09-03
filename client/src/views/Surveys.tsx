@@ -22,15 +22,22 @@ const Surveys: React.FC = () => {
                 <Typography variant="h5">Loading...</Typography>
             ) : (
                 <List>
-                    {surveys.data?.map((survey) => (
-                        <Link
-                            onClick={() => handleUpdateActiveSurvey(survey)}
-                            to={`/surveys/${survey.id}`}
-                            key={survey.id}
-                        >
-                            <ListItem button>{survey.name}</ListItem>
-                        </Link>
-                    ))}
+                    {surveys.data
+                        ?.slice()
+                        .sort(
+                            (first, second) =>
+                                new Date(first.created).getTime() -
+                                new Date(second.created).getTime()
+                        )
+                        .map((survey) => (
+                            <Link
+                                onClick={() => handleUpdateActiveSurvey(survey)}
+                                to={`/surveys/${survey.id}`}
+                                key={survey.id}
+                            >
+                                <ListItem button>{survey.name}</ListItem>
+                            </Link>
+                        ))}
                 </List>
             )}
         </Container>

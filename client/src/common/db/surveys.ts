@@ -15,4 +15,17 @@ export const updateSurvey = async (updatedSurvey: SurveyApi) => {
 export const getNewSurveyId = async () => {
     const surveyRef = await db.collection("surveys").doc();
     return surveyRef.id;
-}
+};
+
+export const addSurveysListener = (
+    callback: (surveys: SurveyApi[]) => void
+) => {
+    const surveysRef = db.collection("surveys");
+
+    const unsubscribe = surveysRef.onSnapshot((snapshot) => {
+        const surveysData = snapshot.docs.map((doc) => doc.data() as SurveyApi);
+        callback(surveysData);
+    });
+
+    return unsubscribe;
+};
