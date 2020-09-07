@@ -261,7 +261,7 @@ const Survey: React.FC = () => {
                                 />
                             )}
                         </div>
-                        <div>
+                        <div className={classes.buttonsContainer}>
                             <Button
                                 disabled={activeStep === 0}
                                 onClick={handleBack}
@@ -319,6 +319,9 @@ const useStyles = makeStyles((theme) => ({
     },
     slider: {
         width: 300,
+    },
+    buttonsContainer: {
+        marginTop: theme.spacing(2),
     },
 }));
 
