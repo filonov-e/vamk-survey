@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import {
     Container,
     Typography,
@@ -8,9 +8,10 @@ import {
     Button,
     makeStyles,
     Slider,
+    TextField,
 } from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import { AnswerApi, AnswerRating, QuestionApi } from "common/types";
+import { AnswerApi, AnswerRating, AnswerText, QuestionApi } from "common/types";
 import { updateAnswer, getNewAnswerId } from "common/db/answers";
 import { useDispatch, useSelector } from "react-redux";
 import { updateActiveSurvey } from "redux/slices/activeSurveySlices";
@@ -134,7 +135,7 @@ const Survey: React.FC = () => {
         handleSubmitAnswers();
     };
 
-    const handleUpdateAnswer = (
+    const handleUpdateAnswerRating = (
         event: React.ChangeEvent<{}>,
         value: number | number[]
     ) => {
@@ -150,6 +151,30 @@ const Survey: React.FC = () => {
             type: questionAnswerType as "rating",
             questionId,
             rating: value as number,
+        };
+
+        const updatedAnswers = [
+            ...answers.filter((answer) => answer.questionId !== questionId),
+            updatedAnswer,
+        ];
+        setAnswers(updatedAnswers);
+    };
+
+    const handleUpdateAnswerText = (
+        event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+    ) => {
+        const questionId = questionsData[activeStep].id;
+        const questionAnswerType = questionsData[activeStep].answerType;
+
+        const answerToUpdate = answers.find(
+            (a) => a.questionId === questionId
+        ) as AnswerText;
+
+        const updatedAnswer: AnswerText = {
+            ...answerToUpdate,
+            type: questionAnswerType as "text",
+            questionId,
+            text: event.target.value,
         };
 
         const updatedAnswers = [
@@ -212,19 +237,29 @@ const Survey: React.FC = () => {
                             {getStepContent(activeStep)}
                         </Typography>
                         <div>
-                            <Slider
-                                valueLabelDisplay="auto"
-                                step={1}
-                                marks
-                                min={1}
-                                max={5}
-                                className={classes.slider}
-                                onChangeCommitted={handleUpdateAnswer}
-                                value={
-                                    (getActiveAnswer() as AnswerRating)
-                                        ?.rating ?? 3
-                                }
-                            />
+                            {getActiveAnswer()?.type === "rating" ? (
+                                <Slider
+                                    valueLabelDisplay="auto"
+                                    step={1}
+                                    marks
+                                    min={1}
+                                    max={5}
+                                    className={classes.slider}
+                                    onChangeCommitted={handleUpdateAnswerRating}
+                                    value={
+                                        (getActiveAnswer() as AnswerRating)
+                                            ?.rating ?? 3
+                                    }
+                                />
+                            ) : (
+                                <TextField
+                                    value={
+                                        (getActiveAnswer() as AnswerText)
+                                            ?.text ?? ""
+                                    }
+                                    onChange={handleUpdateAnswerText}
+                                />
+                            )}
                         </div>
                         <div>
                             <Button

@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import { updateSurvey } from "common/db/surveys";
 import { QuestionApi, AnswerType } from "common/types";
 import {
@@ -7,6 +7,8 @@ import {
     TextField,
     Container,
     makeStyles,
+    Paper,
+    Grid,
 } from "@material-ui/core";
 import { getNewQuestionId, updateQuestion } from "common/db/questions";
 import AnswerSelectionDialog from "components/AnswerSelectionDialog";
@@ -33,6 +35,10 @@ const AddQuestions = () => {
 
     const classes = useStyles(questions.length === 0);
 
+    useEffect(() => {
+        questions.length > 0 && setActiveQuestionIndex(questions.length - 1);
+    }, [questions.length]);
+
     const handleAddQuestion = async () => {
         if (!surveyId) {
             return;
@@ -55,30 +61,20 @@ const AddQuestions = () => {
         event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const { value } = event.target;
-        setQuestions((prevQuestions) => {
-            const temp = [...prevQuestions];
-            temp[activeQuestionIndex].question = value;
-            return temp;
-        });
+        const updatedQuestions = [...questions];
+        updatedQuestions[activeQuestionIndex].question = value;
+        setQuestions(updatedQuestions);
     };
 
-    const handleAddAnswer = async (type: AnswerType) => {
+    const handleUpdateAnswerType = (type: AnswerType) => {
         setAnswerSelectionDialogOpen(false);
         updateQuestionAnswerType(type);
     };
 
     const updateQuestionAnswerType = (type: AnswerType) => {
-        const filteredQuestions = questions.filter(
-            (q) => q.id !== activeQuestion.id
-        );
-
-        setQuestions([
-            ...filteredQuestions,
-            {
-                ...activeQuestion,
-                answerType: type,
-            },
-        ]);
+        const updatedQuestions = [...questions];
+        updatedQuestions[activeQuestionIndex].answerType = type;
+        setQuestions(updatedQuestions);
     };
 
     const openAnswerSelectionDialog = () => {
@@ -112,6 +108,7 @@ const AddQuestions = () => {
                 }}
                 count={questions.length}
                 shape="rounded"
+                page={activeQuestionIndex + 1}
                 onChange={handleQuestionIndexChange}
             />
             {questions.length === 0 && (
@@ -122,14 +119,6 @@ const AddQuestions = () => {
                 >
                     No questions added yet
                 </Typography>
-            )}
-            {questions.length > 0 && (
-                <TextField
-                    onChange={handleQuestionChange}
-                    placeholder="Enter question"
-                    value={activeQuestion.question}
-                    multiline
-                />
             )}
             <div className={classes.addQuestionButtonContainer}>
                 <Button
@@ -142,24 +131,50 @@ const AddQuestions = () => {
                     + Add question
                 </Button>
             </div>
-            {activeQuestion && (
-                <Button onClick={openAnswerSelectionDialog}>Add answer</Button>
+            {questions.length > 0 && (
+                <>
+                    <Paper classes={{ root: classes.paperRoot }}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={6}>
+                                <TextField
+                                    onChange={handleQuestionChange}
+                                    placeholder="Enter question"
+                                    value={activeQuestion.question}
+                                    multiline
+                                    fullWidth
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                {activeQuestion && (
+                                    <Typography variant="button">
+                                        Selected answer type:{" "}
+                                        {activeQuestion.answerType}
+                                    </Typography>
+                                )}
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={openAnswerSelectionDialog}
+                                >
+                                    Change answer type
+                                </Button>
+                            </Grid>
+                            <AnswerSelectionDialog
+                                open={answerSelectionDialogOpen}
+                                onSelect={handleUpdateAnswerType}
+                            />
+                        </Grid>
+                    </Paper>
+                    <Button
+                        disabled={questions.length === 0}
+                        onClick={handleSaveSurvey}
+                        className={classes.saveSurveyButton}
+                    >
+                        Save survey
+                    </Button>
+                </>
             )}
-            {activeQuestion && (
-                <Typography variant="button">
-                    Selected answer type: {activeQuestion.answerType}
-                </Typography>
-            )}
-            <AnswerSelectionDialog
-                open={answerSelectionDialogOpen}
-                onSelect={handleAddAnswer}
-            />
-            <Button
-                disabled={questions.length === 0}
-                onClick={handleSaveSurvey}
-            >
-                Save survey
-            </Button>
         </Container>
     );
 };
@@ -170,6 +185,9 @@ const useStyles = makeStyles((theme) => ({
     },
     paginationUl: {
         justifyContent: "center",
+    },
+    paperRoot: {
+        padding: theme.spacing(2, 4),
     },
     noQuestionsLabel: {
         textAlign: "center",
@@ -186,6 +204,11 @@ const useStyles = makeStyles((theme) => ({
         top: empty ? "200px" : theme.spacing(8),
         right: empty ? "0px" : theme.spacing(4),
     }),
+    saveSurveyButton: {
+        position: "absolute",
+        right: theme.spacing(4),
+        marginTop: theme.spacing(2),
+    },
     addQuestionButton: {
         fontSize: "1.1rem",
         backgroundColor: "rgba(64, 255, 64, 0.5)",
