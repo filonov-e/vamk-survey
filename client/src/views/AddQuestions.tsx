@@ -167,7 +167,10 @@ const AddQuestions = () => {
                         </Grid>
                     </Paper>
                     <Button
-                        disabled={questions.length === 0}
+                        disabled={
+                            questions.length === 0 ||
+                            !questions.every((q) => q.question)
+                        }
                         onClick={handleSaveSurvey}
                         className={classes.saveSurveyButton}
                     >
