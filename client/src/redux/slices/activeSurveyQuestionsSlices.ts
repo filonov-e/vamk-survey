@@ -12,7 +12,10 @@ export const fetchActiveSurveyQuestions = createAsyncThunk(
     "activeSurveyQuestions/fetchActiveSurveyQuestions",
     async (surveyId: string) => {
         const questionsData = await getSurveyQuestions(surveyId);
-        return questionsData;
+        return questionsData.sort(
+            (a, b) =>
+                new Date(a.created).getTime() - new Date(b.created).getTime()
+        );
     }
 );
 

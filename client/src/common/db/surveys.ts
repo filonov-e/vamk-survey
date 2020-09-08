@@ -12,6 +12,11 @@ export const updateSurvey = async (updatedSurvey: SurveyApi) => {
     surveyRef.set(updatedSurvey);
 };
 
+export const deleteSurvey = async (surveyId: string) => {
+    const surveyRef = await db.collection("surveys").doc(surveyId);
+    surveyRef.delete();
+};
+
 export const getNewSurveyId = async () => {
     const surveyRef = await db.collection("surveys").doc();
     return surveyRef.id;
